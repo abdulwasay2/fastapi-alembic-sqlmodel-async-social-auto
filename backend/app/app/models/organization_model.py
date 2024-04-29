@@ -1,10 +1,11 @@
-from uuid import UUID
-from app.utils.uuid6 import uuid7
-from sqlmodel import SQLModel as SQLModel, Field
+from sqlmodel import SQLModel as SQLModel
 from app.models.base_uuid_model import BaseUUIDModel
 
 
 
-class Organization(SQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True)
+class OrganizationBase(SQLModel):
     name: str
+
+
+class Organization(BaseUUIDModel, OrganizationBase, table=True):
+    pass

@@ -54,5 +54,10 @@ class User(BaseUUIDModel, UserBase, table=True):
     following_count: int | None = Field(
         default=None, sa_column=Column(BigInteger(), server_default="0")
     )
-    organization_id: int | None = Field(default=None, foreign_key="organization.id")
-    organization: Organization | None = Relationship(back_populates="related_organization")
+    organization_id: UUID | None = Field(default=None, foreign_key="Organization.id")
+    organization: Organization = Relationship(
+        sa_relationship_kwargs={
+            "lazy": "joined",
+            "primaryjoin": "User.organization_id==Organization.id",
+        }
+    )
