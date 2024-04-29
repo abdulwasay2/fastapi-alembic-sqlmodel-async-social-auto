@@ -22,7 +22,7 @@ from langchain.chat_models import ChatOpenAI
 from langchain.schema import HumanMessage
 from sqlalchemy.pool import NullPool, AsyncAdaptedQueuePool
 from starlette.middleware.cors import CORSMiddleware
-from transformers import pipeline
+# from transformers import pipeline
 
 from app import crud
 from app.api.deps import get_redis_client
@@ -86,13 +86,13 @@ async def lifespan(app: FastAPI):
     await FastAPILimiter.init(redis_client, identifier=user_id_identifier)
 
     # Load a pre-trained sentiment analysis model as a dictionary to an easy cleanup
-    models: dict[str, Any] = {
-        "sentiment_model": pipeline(
-            "sentiment-analysis",
-            model="distilbert-base-uncased-finetuned-sst-2-english",
-        ),
-    }
-    g.set_default("sentiment_model", models["sentiment_model"])
+    # models: dict[str, Any] = {
+    #     "sentiment_model": pipeline(
+    #         "sentiment-analysis",
+    #         model="distilbert-base-uncased-finetuned-sst-2-english",
+    #     ),
+    # }
+    # g.set_default("sentiment_model", models["sentiment_model"])
     print("startup fastapi")
     yield
     # shutdown

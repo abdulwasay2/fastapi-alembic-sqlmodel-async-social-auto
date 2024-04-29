@@ -7,48 +7,48 @@ from app.models.hero_model import Hero
 from app.db.session import SessionLocal
 import logging
 from celery import Task
-from transformers import pipeline
+# from transformers import pipeline
 
 
-class PredictTransformersPipelineTask(Task):
-    """
-    Abstraction of Celery's Task class to support loading transformers model.
-    """
+# class PredictTransformersPipelineTask(Task):
+#     """
+#     Abstraction of Celery's Task class to support loading transformers model.
+#     """
 
-    task_name = ""
-    model_name = ""
-    abstract = True
+#     task_name = ""
+#     model_name = ""
+#     abstract = True
 
-    def __init__(self):
-        super().__init__()
-        self.pipeline = None
+#     def __init__(self):
+#         super().__init__()
+#         self.pipeline = None
 
-    def __call__(self, *args, **kwargs):
-        """
-        Load pipeline on first call (i.e. first task processed)
-        Avoids the need to load pipeline on each task request
-        """
-        if not self.pipeline:
-            logging.info("Loading pipeline...")
-            self.pipeline = pipeline(self.task_name, model=self.model_name)
-            logging.info("Pipeline loaded")
-        return self.run(*args, **kwargs)
+#     def __call__(self, *args, **kwargs):
+#         """
+#         Load pipeline on first call (i.e. first task processed)
+#         Avoids the need to load pipeline on each task request
+#         """
+#         if not self.pipeline:
+#             logging.info("Loading pipeline...")
+#             self.pipeline = pipeline(self.task_name, model=self.model_name)
+#             logging.info("Pipeline loaded")
+#         return self.run(*args, **kwargs)
 
 
-@celery.task(
-    ignore_result=False,
-    bind=True,
-    base=PredictTransformersPipelineTask,
-    task_name="text-generation",
-    model_name="gpt2",
-    name="tasks.predict_transformers_pipeline",
-)
-def predict_transformers_pipeline(self, prompt: str):
-    """
-    Essentially the run method of PredictTask
-    """
-    result = self.pipeline(prompt)
-    return result
+# @celery.task(
+#     ignore_result=False,
+#     bind=True,
+#     base=PredictTransformersPipelineTask,
+#     task_name="text-generation",
+#     model_name="gpt2",
+#     name="tasks.predict_transformers_pipeline",
+# )
+# def predict_transformers_pipeline(self, prompt: str):
+#     """
+#     Essentially the run method of PredictTask
+#     """
+#     result = self.pipeline(prompt)
+#     return result
 
 
 @celery.task(name="tasks.increment")
