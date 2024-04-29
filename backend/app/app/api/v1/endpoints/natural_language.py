@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from app.api import deps
-from app.api.celery_task import predict_transformers_pipeline
+# from app.api.celery_task import predict_transformers_pipeline
 from app.models.user_model import User
 from fastapi import APIRouter, Depends, HTTPException
 from app.utils.fastapi_globals import g
@@ -29,45 +29,45 @@ async def sentiment_analysis_prediction(
     return create_response(message="Prediction got succesfully", data=prediction)
 
 
-@router.post(
-    "/text_generation_prediction_batch_task",
-    dependencies=[
-        Depends(RateLimiter(times=10, hours=24)),
-    ],
-)
-async def text_generation_prediction_batch_task(
-    prompt: str = "Batman is awesome because",
-) -> IPostResponseBase:
-    """
-    Async batch task for text generation using a NLP model from transformers libray
-    """
-    prection_task = predict_transformers_pipeline.delay(prompt)
-    return create_response(
-        message="Prediction got succesfully", data={"task_id": prection_task.task_id}
-    )
+# @router.post(
+#     "/text_generation_prediction_batch_task",
+#     dependencies=[
+#         Depends(RateLimiter(times=10, hours=24)),
+#     ],
+# )
+# async def text_generation_prediction_batch_task(
+#     prompt: str = "Batman is awesome because",
+# ) -> IPostResponseBase:
+#     """
+#     Async batch task for text generation using a NLP model from transformers libray
+#     """
+#     prection_task = predict_transformers_pipeline.delay(prompt)
+#     return create_response(
+#         message="Prediction got succesfully", data={"task_id": prection_task.task_id}
+#     )
 
 
-@router.post(
-    "/text_generation_prediction_batch_task_after_some_seconds",
-    dependencies=[
-        Depends(RateLimiter(times=10, hours=24)),
-    ],
-)
-async def text_generation_prediction_batch_task_after_some_seconds(
-    prompt: str = "Batman is awesome because", seconds: float = 5
-) -> IPostResponseBase:
-    """
-    Async batch task for text generation using a NLP model from transformers libray
+# @router.post(
+#     "/text_generation_prediction_batch_task_after_some_seconds",
+#     dependencies=[
+#         Depends(RateLimiter(times=10, hours=24)),
+#     ],
+# )
+# async def text_generation_prediction_batch_task_after_some_seconds(
+#     prompt: str = "Batman is awesome because", seconds: float = 5
+# ) -> IPostResponseBase:
+#     """
+#     Async batch task for text generation using a NLP model from transformers libray
 
-    It is executed after x number of seconds
-    """
-    delay_elapsed = datetime.utcnow() + timedelta(seconds=seconds)
-    prection_task = predict_transformers_pipeline.apply_async(
-        args=[prompt], eta=delay_elapsed
-    )
-    return create_response(
-        message="Prediction got succesfully", data={"task_id": prection_task.task_id}
-    )
+#     It is executed after x number of seconds
+#     """
+#     delay_elapsed = datetime.utcnow() + timedelta(seconds=seconds)
+#     prection_task = predict_transformers_pipeline.apply_async(
+#         args=[prompt], eta=delay_elapsed
+#     )
+#     return create_response(
+#         message="Prediction got succesfully", data={"task_id": prection_task.task_id}
+#     )
 
 
 @router.get(
