@@ -1,20 +1,29 @@
+from uuid import UUID
 from app.models.account_model import Account
-from app.models.fan_model import Fan
-from sqlmodel import SQLModel, Field, Relationship, Enum
+from sqlmodel import SQLModel, Field, JSON, Relationship
+from app.models.base_uuid_model import BaseUUIDModel
+from pydantic import BaseModel
 
 
-class StatusEnum(str, Enum):
-    ACTIVE = "active"
-    DELETED = "deleted"
+class MessagesDetails(BaseModel):
+    role: str
+    message: str
 
 
-class Coversation(SQLModel, table=True):
-    id: int = Field(primary_key=True)
-    account_id: int | None = Field(default=None, foreign_key="account.id")
-    account: Account | None = Relationship(back_populates="conversation_account")
-    status: Enum[StatusEnum]
-    fan_id: int | None = Field(default=None, foreign_key="fan.id")
-    fan: Fan | None = Relationship(back_populates="related_fan")
-    # messages is what?
-    fan_name: str | None
-    fan_url: str | None
+class ConversationBase(SQLModel):
+    account_id: UUID
+    # messages: list[MessagesDetails] | None
+    fan_name: str
+    fan_url: str = "https://tinder.com"
+
+
+class Conversation(BaseUUIDModel, ConversationBase, table=True):
+    status: str = Field(default="active")
+    # messages: JSON
+    account_id: UUID = Field(foreign_key="Account.id")
+    account: Account = Relationship(
+        sa_relationship_kwargs={
+            "lazy": "joined",
+            "primaryjoin": "Conversation.account_id==Account.id",
+        }
+    )

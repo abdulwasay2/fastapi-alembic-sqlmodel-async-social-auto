@@ -10,6 +10,7 @@ from app.api.v1.endpoints import (
     organization,
     project,
     account,
+    conversation,
     cache,
     weather,
     report,
@@ -29,6 +30,7 @@ api_router.include_router(report.router, prefix="/report", tags=["report"])
 api_router.include_router(organization.router, prefix="/organization", tags=["organization"])
 api_router.include_router(project.router, prefix="/project", tags=["project"])
 api_router.include_router(account.router, prefix="/account", tags=["account"])
+api_router.include_router(conversation.router, prefix="/conversation", tags=["conversation"])
 api_router.include_router(
     natural_language.router, prefix="/natural_language", tags=["natural_language"]
 )

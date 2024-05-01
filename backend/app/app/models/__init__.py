@@ -9,3 +9,4 @@ from .user_follow_model import UserFollow
 from .project_model import Project
 from .organization_model import Organization
 from .account_model import Account
+from .conversation_model import Conversation
