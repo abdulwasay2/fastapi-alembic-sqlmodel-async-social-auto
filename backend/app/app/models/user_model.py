@@ -1,4 +1,5 @@
 from app.models.base_uuid_model import BaseUUIDModel
+from app.models.organization_model import Organization
 from app.models.links_model import LinkGroupUser
 from app.models.image_media_model import ImageMedia
 from app.schemas.common_schema import IGenderEnum
@@ -52,4 +53,11 @@ class User(BaseUUIDModel, UserBase, table=True):
     )
     following_count: int | None = Field(
         default=None, sa_column=Column(BigInteger(), server_default="0")
+    )
+    organization_id: UUID | None = Field(default=None, foreign_key="Organization.id")
+    organization: Organization = Relationship(
+        sa_relationship_kwargs={
+            "lazy": "joined",
+            "primaryjoin": "User.organization_id==Organization.id",
+        }
     )

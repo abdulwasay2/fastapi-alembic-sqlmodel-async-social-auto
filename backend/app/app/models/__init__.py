@@ -7,3 +7,4 @@ from .media_model import Media
 from .image_media_model import ImageMedia
 from .user_follow_model import UserFollow
 from .project_model import Project
+from .organization_model import Organization
