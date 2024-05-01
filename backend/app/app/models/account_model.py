@@ -15,7 +15,7 @@ class AccountBase(SQLModel):
     location: str | None
     language: str = "en"
     bio: str | None
-    organization_id: UUID
+    organization_id: UUID = None
 
 
 class Account(BaseUUIDModel, AccountBase, table=True):

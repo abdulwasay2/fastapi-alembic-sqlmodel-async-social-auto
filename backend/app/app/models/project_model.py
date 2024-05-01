@@ -58,7 +58,7 @@ class Limits(BaseUUIDModel, SQLModel, table=True):
     project: Project = Relationship(
         sa_relationship_kwargs={
             "lazy": "joined",
-            "primaryjoin": "Limit.project_id==Project.id",
+            "primaryjoin": "Limits.project_id==Project.id",
         }
     )
 
