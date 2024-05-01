@@ -33,10 +33,13 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return self.db
 
     async def get(
-        self, *, id: UUID | str, db_session: AsyncSession | None = None
+        self, *, id: UUID | str, db_session: AsyncSession | None = None, user_id: UUID = None,
     ) -> ModelType | None:
         db_session = db_session or self.db.session
-        query = select(self.model).where(self.model.id == id)
+        if user_id:
+            query = select(self.model).where(self.model.id == id, self.model.user_id == user_id)
+        else:
+            query = select(self.model).where(self.model.id == id)
         response = await db_session.execute(query)
         return response.scalar_one_or_none()
 
@@ -152,13 +155,20 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         *,
         obj_in: CreateSchemaType | ModelType,
         created_by_id: UUID | str | None = None,
+        user_id: UUID | str | None = None,
         db_session: AsyncSession | None = None,
     ) -> ModelType:
         db_session = db_session or self.db.session
+        if user_id:
+            obj_in.user_id = user_id
+
         db_obj = self.model.model_validate(obj_in)  # type: ignore
 
         if created_by_id:
             db_obj.created_by_id = created_by_id
+
+        if user_id:
+            db_obj.user_id = user_id
 
         try:
             db_session.add(db_obj)
