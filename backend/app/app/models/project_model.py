@@ -29,6 +29,44 @@ class ProjectBase(SQLModel):
     name: str
 
 
+class LimitsBase(SQLModel):
+    daily_swipe_limit: int | None
+    daily_match_limit: int | None
+    daily_conversations_limit: int | None
+    daily_messages_limit: int | None
+
+
+class DelaysBase(SQLModel):
+    response_delay: int | None
+    followup_delay: int | None 
+    open_profile_delay: int | None
+    delay_before_message: int | None
+
+
+class SwipeSettingsBase(SQLModel):
+    gender_preferences: str = "male"
+    age_range_start: int | None
+    age_range_end: int | None
+    swipe_right_ratio: int | None
+    swipe_delay: int | None
+
+
+class ChattingSettingsBase(SQLModel):
+    target_platform: str
+    target_handle: str
+    custom_cta: str = "male"
+    messages_before_handle: int | None
+    begin_chatting_every: int | None
+    no_old_conversations_messages: int | None
+
+
+class GeneralSettingsBase(SQLModel):
+    block_images: bool = False
+    sleep_duration: int | None
+    random_naps: int | None
+
+
+
 class Project(BaseUUIDModel, ProjectBase, table=True):
     platform: str = Field(default="tinder", nullable=False)
     status: str = Field(default="running", nullable=False)
@@ -41,41 +79,17 @@ class Project(BaseUUIDModel, ProjectBase, table=True):
     )
 
 
-class Limits(BaseUUIDModel, SQLModel, table=True):
-    daily_swipe_limit: int | None = Field(
-        default=None, sa_column=Column(BigInteger(), server_default="0")
-    )
-    daily_match_limit: int | None = Field(
-        default=None, sa_column=Column(BigInteger(), server_default="0")
-    )
-    daily_conversations_limit: int | None = Field(
-        default=None, sa_column=Column(BigInteger(), server_default="0")
-    )
-    daily_messages_limit: int | None = Field(
-        default=None, sa_column=Column(BigInteger(), server_default="0")
-    )
+class Limits(BaseUUIDModel, LimitsBase, table=True):
     project_id: UUID = Field(foreign_key="Project.id")
     project: Project = Relationship(
         sa_relationship_kwargs={
             "lazy": "joined",
-            "primaryjoin": "Limit.project_id==Project.id",
+            "primaryjoin": "Limits.project_id==Project.id",
         }
     )
 
 
-class Delays(BaseUUIDModel, SQLModel, table=True):
-    response_delay: int | None = Field(
-        default=None, sa_column=Column(BigInteger(), server_default="0")
-    )
-    followup_delay: int | None = Field(
-        default=None, sa_column=Column(BigInteger(), server_default="0")
-    )
-    open_profile_delay: int | None = Field(
-        default=None, sa_column=Column(BigInteger(), server_default="0")
-    )
-    delay_before_message: int | None = Field(
-        default=None, sa_column=Column(BigInteger(), server_default="0")
-    )
+class Delays(BaseUUIDModel, DelaysBase, table=True):
     project_id: UUID = Field(foreign_key="Project.id")
     project: Project = Relationship(
         sa_relationship_kwargs={
@@ -86,20 +100,7 @@ class Delays(BaseUUIDModel, SQLModel, table=True):
 
 
 
-class SwipeSettings(BaseUUIDModel, SQLModel, table=True):
-    gender_preferences: str = Field(default="male", nullable=False)
-    age_range_start: int | None = Field(
-        default=None, sa_column=Column(BigInteger(), server_default="0")
-    )
-    age_range_end: int | None = Field(
-        default=None, sa_column=Column(BigInteger(), server_default="0")
-    )
-    swipe_right_ratio: int | None = Field(
-        default=None, sa_column=Column(BigInteger(), server_default="0")
-    )
-    swipe_delay: int | None = Field(
-        default=None, sa_column=Column(BigInteger(), server_default="0")
-    )
+class SwipeSettings(BaseUUIDModel, SwipeSettingsBase, table=True):
     project_id: UUID = Field(foreign_key="Project.id")
     project: Project = Relationship(
         sa_relationship_kwargs={
@@ -109,19 +110,7 @@ class SwipeSettings(BaseUUIDModel, SQLModel, table=True):
     )
 
 
-class ChattingSettings(BaseUUIDModel, SQLModel, table=True):
-    target_platform: str = Field(nullable=False)
-    target_handle: str = Field(nullable=False)
-    custom_cta: str = Field(default="male", nullable=False)
-    messages_before_handle: int | None = Field(
-        default=None, sa_column=Column(BigInteger(), server_default="0")
-    )
-    begin_chatting_every: int | None = Field(
-        default=None, sa_column=Column(BigInteger(), server_default="0")
-    )
-    no_old_conversations_messages: int | None = Field(
-        default=None, sa_column=Column(BigInteger(), server_default="0")
-    )
+class ChattingSettings(BaseUUIDModel, ChattingSettingsBase, table=True):
     project_id: UUID = Field(foreign_key="Project.id")
     project: Project = Relationship(
         sa_relationship_kwargs={
@@ -131,14 +120,7 @@ class ChattingSettings(BaseUUIDModel, SQLModel, table=True):
     )
 
 
-class GeneralSettings(BaseUUIDModel, SQLModel, table=True):
-    block_images: bool = Field(default=False)
-    sleep_duration: int | None = Field(
-        default=None, sa_column=Column(BigInteger(), server_default="0")
-    )
-    random_naps: int | None = Field(
-        default=None, sa_column=Column(BigInteger(), server_default="0")
-    )
+class GeneralSettings(BaseUUIDModel, GeneralSettingsBase, table=True):
     project_id: UUID = Field(foreign_key="Project.id")
     project: Project = Relationship(
         sa_relationship_kwargs={
