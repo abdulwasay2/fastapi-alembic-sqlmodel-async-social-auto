@@ -11,6 +11,15 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlmodel.sql.expression import Select
 from sqlalchemy import exc
 
+from ..models.project_model import (
+    Limits,
+    Delays,
+    SwipeSettings,
+    ChattingSettings,
+    GeneralSettings,
+    
+)
+
 ModelType = TypeVar("ModelType", bound=SQLModel)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
 UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
@@ -173,6 +182,46 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         try:
             db_session.add(db_obj)
             await db_session.commit()
+            obj_id = db_obj.id
+
+            child_objects = []
+            obj_in = obj_in.dict()
+            if "limits" in obj_in:
+                limits = obj_in.pop("limits")
+                limits["project_id"] = obj_id
+                db_limits = Limits(**limits)
+                child_objects.append(db_limits)
+
+            if "delays" in obj_in:
+                delays = obj_in.pop("delays")
+                delays["project_id"] = obj_id
+                db_delays = Delays(**delays)
+                child_objects.append(db_delays)
+
+            if "chatting_settings" in obj_in:
+                chatting_settings = obj_in.pop("chatting_settings")
+                chatting_settings["project_id"] = obj_id
+                db_chatting_settings = ChattingSettings(**chatting_settings)
+                child_objects.append(db_chatting_settings)
+
+            if "swipe_settings" in obj_in:
+                swipe_settings = obj_in.pop("swipe_settings")
+                swipe_settings["project_id"] = obj_id
+                db_swipe_settings = SwipeSettings(**swipe_settings)
+                child_objects.append(db_swipe_settings)
+
+            if "general_settings" in obj_in:
+                general_settings = obj_in.pop("general_settings")
+                general_settings["project_id"] = obj_id
+                db_general_settings = GeneralSettings(**general_settings)
+                child_objects.append(db_general_settings)
+
+            if child_objects:
+                # Add all child objects to the session
+                db_session.add_all(child_objects)
+                # Commit the session
+                await db_session.commit()
+
         except exc.IntegrityError:
             db_session.rollback()
             raise HTTPException(

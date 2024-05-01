@@ -78,7 +78,6 @@ async def create_project(
     project_current = await crud.project.get_project_by_name(name=project.name, current_user=current_user)
     if project_current:
         raise NameExistException(Project, name=project.name)
-    # new_project = await crud.project.create(obj_in=project, created_by_id=current_user.id)
     new_project = await crud.project.create(obj_in=project, user_id=current_user.id)
     return create_response(data=new_project)
 
