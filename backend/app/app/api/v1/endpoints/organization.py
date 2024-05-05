@@ -18,7 +18,6 @@ from app.schemas.response_schema import (
     IPutResponseBase,
     create_response,
 )
-from app.schemas.role_schema import IRoleEnum
 from app.utils.exceptions import (
     IdNotFoundException,
     NameExistException,
@@ -29,10 +28,7 @@ router = APIRouter()
 
 @router.get("")
 async def get_organization(
-    params: Params = Depends(),
-    current_user: User = Depends(
-        deps.get_current_user(required_roles=[IRoleEnum.admin, IRoleEnum.manager])
-    ),
+    params: Params = Depends()
 ) -> IGetResponsePaginated[IOrganizationRead]:
     """
     Gets a paginated list of organization
@@ -43,10 +39,7 @@ async def get_organization(
 
 @router.get("/{organization_id}")
 async def get_organization_by_id(
-    organization_id: UUID,
-    current_user: User = Depends(
-        deps.get_current_user(required_roles=[IRoleEnum.admin, IRoleEnum.manager])
-    ),
+    organization_id: UUID
 ) -> IGetResponseBase[IOrganizationRead]:
     """
     Gets a organization by its id
@@ -60,17 +53,10 @@ async def get_organization_by_id(
 
 @router.post("")
 async def create_organization(
-    organization: IOrganizationCreate,
-    current_user: User = Depends(
-        deps.get_current_user(required_roles=[IRoleEnum.admin, IRoleEnum.manager])
-    ),
+    organization: IOrganizationCreate
 ) -> IPostResponseBase[IOrganizationRead]:
     """
     Creates a new organization
-
-    Required roles:
-    - admin
-    - manager
     """
     organization_current = await crud.organization.get_organization_by_name(name=organization.name)
     if organization_current:
@@ -83,17 +69,10 @@ async def create_organization(
 @router.put("/{organization_id}")
 async def update_organization(
     organization: IOrganizationUpdate,
-    current_organization: Organization = Depends(organization_deps.get_organization_by_id),
-    current_user: User = Depends(
-        deps.get_current_user(required_roles=[IRoleEnum.admin, IRoleEnum.manager])
-    ),
+    current_organization: Organization = Depends(organization_deps.get_organization_by_id)
 ) -> IPutResponseBase[IOrganizationRead]:
     """
     Updates a organization by its id
-
-    Required roles:
-    - admin
-    - manager
     """
     organization_updated = await crud.organization.update(obj_current=current_organization, obj_new=organization)
     return create_response(data=organization_updated)

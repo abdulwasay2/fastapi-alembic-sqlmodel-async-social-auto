@@ -188,33 +188,34 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             obj_in = obj_in.dict()
             if "limits" in obj_in:
                 limits = obj_in.pop("limits")
-                limits["project_id"] = obj_id
-                db_limits = Limits(**limits)
-                child_objects.append(db_limits)
+                limits[0]["project_id"] = obj_id
+                db_limits = Limits(**limits[0])
+                # child_objects.append(db_limits)
 
             if "delays" in obj_in:
                 delays = obj_in.pop("delays")
-                delays["project_id"] = obj_id
-                db_delays = Delays(**delays)
-                child_objects.append(db_delays)
+                delays[0]["project_id"] = obj_id
+                db_delays = Delays(**delays[0])
+                # child_objects.append(db_delays)
 
             if "chatting_settings" in obj_in:
                 chatting_settings = obj_in.pop("chatting_settings")
-                chatting_settings["project_id"] = obj_id
-                db_chatting_settings = ChattingSettings(**chatting_settings)
-                child_objects.append(db_chatting_settings)
+                print(chatting_settings[0], "\n\n\n")
+                chatting_settings[0]["project_id"] = obj_id
+                db_chatting_settings = ChattingSettings(**chatting_settings[0])
+                # child_objects.append(db_chatting_settings)
 
             if "swipe_settings" in obj_in:
                 swipe_settings = obj_in.pop("swipe_settings")
-                swipe_settings["project_id"] = obj_id
-                db_swipe_settings = SwipeSettings(**swipe_settings)
-                child_objects.append(db_swipe_settings)
+                swipe_settings[0]["project_id"] = obj_id
+                db_swipe_settings = SwipeSettings(**swipe_settings[0])
+                # child_objects.append(db_swipe_settings)
 
             if "general_settings" in obj_in:
                 general_settings = obj_in.pop("general_settings")
-                general_settings["project_id"] = obj_id
-                db_general_settings = GeneralSettings(**general_settings)
-                child_objects.append(db_general_settings)
+                general_settings[0]["project_id"] = obj_id
+                db_general_settings = GeneralSettings(**general_settings[0])
+                # child_objects.append(db_general_settings)
 
             if child_objects:
                 # Add all child objects to the session
@@ -223,6 +224,8 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
                 await db_session.commit()
 
         except exc.IntegrityError:
+            from traceback import print_exc
+            print_exc()
             db_session.rollback()
             raise HTTPException(
                 status_code=409,

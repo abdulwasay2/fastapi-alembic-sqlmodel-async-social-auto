@@ -28,54 +28,9 @@ from app import crud
 from app.api.deps import get_redis_client
 from app.api.v1.api import api_router as api_router_v1
 from app.core.config import ModeEnum, settings
-from app.core.security import decode_token
 from app.schemas.common_schema import IChatResponse, IUserMessage
 from app.utils.fastapi_globals import GlobalsMiddleware, g
 from app.utils.uuid6 import uuid7
-
-
-async def user_id_identifier(request: Request):
-    if request.scope["type"] == "http":
-        # Retrieve the Authorization header from the request
-        auth_header = request.headers.get("Authorization")
-
-        if auth_header is not None:
-            # Check that the header is in the correct format
-            header_parts = auth_header.split()
-            if len(header_parts) == 2 and header_parts[0].lower() == "bearer":
-                token = header_parts[1]
-                try:
-                    payload = decode_token(token)
-                except ExpiredSignatureError:
-                    raise HTTPException(
-                        status_code=status.HTTP_403_FORBIDDEN,
-                        detail="Your token has expired. Please log in again.",
-                    )
-                except DecodeError:
-                    raise HTTPException(
-                        status_code=status.HTTP_403_FORBIDDEN,
-                        detail="Error when decoding the token. Please check your request.",
-                    )
-                except MissingRequiredClaimError:
-                    raise HTTPException(
-                        status_code=status.HTTP_403_FORBIDDEN,
-                        detail="There is no required field in your token. Please contact the administrator.",
-                    )
-
-                user_id = payload["sub"]
-
-                return user_id
-
-    if request.scope["type"] == "websocket":
-        return request.scope["path"]
-
-    forwarded = request.headers.get("X-Forwarded-For")
-    if forwarded:
-        return forwarded.split(",")[0]
-
-    client = request.client
-    ip = getattr(client, "host", "0.0.0.0")
-    return ip + ":" + request.scope["path"]
 
 
 @asynccontextmanager
@@ -83,7 +38,7 @@ async def lifespan(app: FastAPI):
     # Startup
     redis_client = await get_redis_client()
     FastAPICache.init(RedisBackend(redis_client), prefix="fastapi-cache")
-    await FastAPILimiter.init(redis_client, identifier=user_id_identifier)
+    await FastAPILimiter.init(redis_client)
 
     # Load a pre-trained sentiment analysis model as a dictionary to an easy cleanup
     # models: dict[str, Any] = {
@@ -98,7 +53,7 @@ async def lifespan(app: FastAPI):
     # shutdown
     await FastAPICache.clear()
     await FastAPILimiter.close()
-    models.clear()
+    # models.clear()
     g.cleanup()
     gc.collect()
 

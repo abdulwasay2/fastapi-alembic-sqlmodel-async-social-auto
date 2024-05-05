@@ -3,6 +3,7 @@
 from celery import Celery
 from app.core.config import settings
 
+
 celery = Celery(
     "async_task",
     broker=f"redis://{settings.REDIS_HOST}:{settings.REDIS_PORT}",
@@ -11,4 +12,6 @@ celery = Celery(
 )
 
 celery.conf.update({"beat_dburi": str(settings.SYNC_CELERY_BEAT_DATABASE_URI)})
+celery.conf.enable_utc = True
+celery.conf.timezone = "UTC"
 celery.autodiscover_tasks()

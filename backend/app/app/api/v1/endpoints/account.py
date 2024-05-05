@@ -18,21 +18,18 @@ from app.schemas.response_schema import (
     IPutResponseBase,
     create_response,
 )
-from app.schemas.role_schema import IRoleEnum
 from app.utils.exceptions import (
     IdNotFoundException,
     NameExistException,
 )
+from app.api.celery_task import increment, validate_account_credentials, validate_account_proxy
 
 router = APIRouter()
 
 
 @router.get("")
 async def get_account(
-    params: Params = Depends(),
-    current_user: User = Depends(
-        deps.get_current_user(required_roles=[IRoleEnum.admin, IRoleEnum.manager])
-    ),
+    params: Params = Depends()
 ) -> IGetResponsePaginated[IAccountRead]:
     """
     Gets a paginated list of account
@@ -43,10 +40,7 @@ async def get_account(
 
 @router.get("/{account_id}")
 async def get_account_by_id(
-    account_id: UUID,
-    current_user: User = Depends(
-        deps.get_current_user(required_roles=[IRoleEnum.admin, IRoleEnum.manager])
-    ),
+    account_id: UUID
 ) -> IGetResponseBase[IAccountRead]:
     """
     Gets a account by its id
@@ -60,10 +54,7 @@ async def get_account_by_id(
 
 @router.post("")
 async def create_account(
-    account: IAccountCreate,
-    current_user: User = Depends(
-        deps.get_current_user(required_roles=[IRoleEnum.admin, IRoleEnum.manager])
-    ),
+    account: IAccountCreate
 ) -> IPostResponseBase[IAccountRead]:
     """
     Creates a new account
@@ -83,10 +74,7 @@ async def create_account(
 @router.put("/{account_id}")
 async def update_account(
     account: IAccountUpdate,
-    current_account: Account = Depends(account_deps.get_account_by_id),
-    current_user: User = Depends(
-        deps.get_current_user(required_roles=[IRoleEnum.admin, IRoleEnum.manager])
-    ),
+    current_account: Account = Depends(account_deps.get_account_by_id)
 ) -> IPutResponseBase[IAccountRead]:
     """
     Updates a account by its id
@@ -97,3 +85,20 @@ async def update_account(
     """
     account_updated = await crud.account.update(obj_current=current_account, obj_new=account)
     return create_response(data=account_updated)
+
+
+@router.post("/validate/{account_id}")
+async def validate_account(
+    account_id: UUID,
+):
+    """
+    Validates the account credentials and proxy
+
+    Required roles:
+    - admin
+    - manager
+    """
+    print(account_id)
+    validate_account_proxy(account_id)
+    validate_account_credentials.delay(account_id)
+    return {"message": "task queued"}

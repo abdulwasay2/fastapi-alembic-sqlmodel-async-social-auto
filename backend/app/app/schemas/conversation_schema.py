@@ -1,10 +1,12 @@
 from app.models.conversation_model import ConversationBase
 from app.utils.partial import optional
 from uuid import UUID
+from sqlmodel import SQLModel
 
 
 class IConversationCreate(ConversationBase):
-    pass
+    status: str
+    account_id: UUID
 
 
 @optional()

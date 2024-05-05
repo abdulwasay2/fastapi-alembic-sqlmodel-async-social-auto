@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 from fastapi_pagination import Params
 from app import crud
 from app.api import deps
-from app.deps import conversation_deps, user_deps
+from app.deps import conversation_deps
 from app.models.conversation_model import Conversation
 from app.models.user_model import User
 from app.schemas.conversation_schema import (
@@ -18,7 +18,6 @@ from app.schemas.response_schema import (
     IPutResponseBase,
     create_response,
 )
-from app.schemas.role_schema import IRoleEnum
 from app.utils.exceptions import (
     IdNotFoundException,
 )
@@ -29,7 +28,6 @@ router = APIRouter()
 @router.get("")
 async def get_conversation(
     params: Params = Depends(),
-    current_user: User = Depends(deps.get_current_user()),
 ) -> IGetResponsePaginated[IConversationRead]:
     """
     Gets a paginated list of conversation
@@ -41,7 +39,6 @@ async def get_conversation(
 @router.get("/{conversation_id}")
 async def get_conversation_by_id(
     conversation_id: UUID,
-    current_user: User = Depends(deps.get_current_user()),
 ) -> IGetResponseBase[IConversationRead]:
     """
     Gets a conversation by its id
@@ -55,10 +52,7 @@ async def get_conversation_by_id(
 
 @router.post("")
 async def create_conversation(
-    conversation: IConversationCreate,
-    current_user: User = Depends(
-        deps.get_current_user(required_roles=[IRoleEnum.admin, IRoleEnum.manager])
-    ),
+    conversation: IConversationCreate
 ) -> IPostResponseBase[IConversationRead]:
     """
     Creates a new conversation
@@ -74,10 +68,7 @@ async def create_conversation(
 @router.put("/{conversation_id}")
 async def update_conversation(
     conversation: IConversationUpdate,
-    current_conversation: Conversation = Depends(conversation_deps.get_conversation_by_id),
-    current_user: User = Depends(
-        deps.get_current_user(required_roles=[IRoleEnum.admin, IRoleEnum.manager])
-    ),
+    current_conversation: Conversation = Depends(conversation_deps.get_conversation_by_id)
 ) -> IPutResponseBase[IConversationRead]:
     """
     Updates a conversation by its id

@@ -2,17 +2,12 @@ from uuid import UUID
 from app.utils.uuid6 import uuid7
 from pydantic import BaseModel, field_validator
 from enum import Enum
-from app.schemas.role_schema import IRoleRead
 
 
 class IGenderEnum(str, Enum):
     female = "female"
     male = "male"
     other = "other"
-
-
-class IMetaGeneral(BaseModel):
-    roles: list[IRoleRead]
 
 
 class IOrderEnum(str, Enum):
@@ -23,6 +18,26 @@ class IOrderEnum(str, Enum):
 class TokenType(str, Enum):
     ACCESS = "access_token"
     REFRESH = "refresh_token"
+
+
+class IStatusEnum(str, Enum):
+    pause = "pause"
+    running = "running"
+    deleted = "deleted"
+
+
+class IConversationStatusEnum(str, Enum):
+    open = "open"
+    closed = "closed"
+
+
+class ITargetPlatformEnum(str, Enum):
+    snapchat = "snapchat"
+    instagram = "instagram"
+    facebook = "facebook"
+    whatsapp = "whatsapp"
+    twitter = "twitter"
+    google = "google"
 
 
 class IUserMessage(BaseModel):

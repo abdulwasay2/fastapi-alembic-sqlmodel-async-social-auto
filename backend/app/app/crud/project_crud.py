@@ -12,7 +12,7 @@ class CRUDProject(CRUDBase[Project, IProjectCreate, IProjectUpdate]):
     ) -> Project:
         db_session = db_session or super().get_db().session
 
-        project = await db_session.execute(select(Project).where(Project.name == name, Project.user_id == current_user.id))
+        project = await db_session.execute(select(Project).where(Project.name == name, Project.user_id == current_user))
         return project.scalar_one_or_none()
 
 project = CRUDProject(Project)

@@ -1,7 +1,6 @@
 from app.models.base_uuid_model import BaseUUIDModel
 from app.models.organization_model import Organization
 from app.models.links_model import LinkGroupUser
-from app.models.image_media_model import ImageMedia
 from app.schemas.common_schema import IGenderEnum
 from datetime import datetime
 from sqlmodel import BigInteger, Field, SQLModel, Relationship, Column, DateTime, String
@@ -40,13 +39,6 @@ class User(BaseUUIDModel, UserBase, table=True):
         back_populates="users",
         link_model=LinkGroupUser,
         sa_relationship_kwargs={"lazy": "selectin"},
-    )
-    image_id: UUID | None = Field(default=None, foreign_key="ImageMedia.id")
-    image: ImageMedia = Relationship(
-        sa_relationship_kwargs={
-            "lazy": "joined",
-            "primaryjoin": "User.image_id==ImageMedia.id",
-        }
     )
     follower_count: int | None = Field(
         default=None, sa_column=Column(BigInteger(), server_default="0")
