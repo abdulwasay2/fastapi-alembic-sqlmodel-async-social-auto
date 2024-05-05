@@ -58,10 +58,6 @@ async def create_account(
 ) -> IPostResponseBase[IAccountRead]:
     """
     Creates a new account
-
-    Required roles:
-    - admin
-    - manager
     """
     account_current = await crud.account.get_account_by_name(name=account.name)
     if account_current:
@@ -78,13 +74,22 @@ async def update_account(
 ) -> IPutResponseBase[IAccountRead]:
     """
     Updates a account by its id
-
-    Required roles:
-    - admin
-    - manager
     """
     account_updated = await crud.account.update(obj_current=current_account, obj_new=account)
     return create_response(data=account_updated)
+
+
+@router.post("/validate_proxy/{account_id}")
+async def validate_account(
+    account_id: UUID,
+):
+    """
+    Validates the account proxy
+    """
+
+    print(account_id)
+    validate_account_proxy.delay(account_id)
+    return {"message": "task queued"}
 
 
 @router.post("/validate/{account_id}")
@@ -93,10 +98,6 @@ async def validate_account(
 ):
     """
     Validates the account credentials and proxy
-
-    Required roles:
-    - admin
-    - manager
     """
     print(account_id)
     validate_account_proxy(account_id)
