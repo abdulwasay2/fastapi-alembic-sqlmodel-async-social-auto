@@ -22,7 +22,6 @@ from langchain.chat_models import ChatOpenAI
 from langchain.schema import HumanMessage
 from sqlalchemy.pool import NullPool, AsyncAdaptedQueuePool
 from starlette.middleware.cors import CORSMiddleware
-# from transformers import pipeline
 
 from app import crud
 from app.api.deps import get_redis_client
@@ -114,7 +113,6 @@ async def root():
     """
     An example "Hello world" FastAPI route.
     """
-    # if oso.is_allowed(user, "read", message):
     return {"message": "Hello World"}
 
 
