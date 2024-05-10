@@ -6,18 +6,14 @@ from uuid import UUID, uuid4
 
 from fastapi import (
     FastAPI,
-    HTTPException,
-    Request,
     WebSocket,
     WebSocketDisconnect,
-    status,
 )
 from fastapi_async_sqlalchemy import SQLAlchemyMiddleware, db
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from fastapi_limiter import FastAPILimiter
 from fastapi_limiter.depends import WebSocketRateLimiter
-from jwt import DecodeError, ExpiredSignatureError, MissingRequiredClaimError
 from langchain.chat_models import ChatOpenAI
 from langchain.schema import HumanMessage
 from sqlalchemy.pool import NullPool, AsyncAdaptedQueuePool
@@ -39,15 +35,6 @@ async def lifespan(app: FastAPI):
     FastAPICache.init(RedisBackend(redis_client), prefix="fastapi-cache")
     await FastAPILimiter.init(redis_client)
 
-    # Load a pre-trained sentiment analysis model as a dictionary to an easy cleanup
-    # models: dict[str, Any] = {
-    #     "sentiment_model": pipeline(
-    #         "sentiment-analysis",
-    #         model="distilbert-base-uncased-finetuned-sst-2-english",
-    #     ),
-    # }
-    # g.set_default("sentiment_model", models["sentiment_model"])
-    print("startup fastapi")
     yield
     # shutdown
     await FastAPICache.clear()

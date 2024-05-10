@@ -1,7 +1,7 @@
 from uuid import UUID
 from typing import List
 from app.utils.uuid6 import uuid7
-from sqlmodel import SQLModel, Field, Relationship, Column, JSON, ARRAY, String
+from sqlmodel import SQLModel, Field, Relationship, Column, JSON, ARRAY, String, ForeignKey
 from app.models.base_uuid_model import BaseUUIDModel
 from app.schemas.common_schema import IGenderEnum
 from app.models.organization_model import Organization
@@ -20,7 +20,7 @@ class AccountBase(SQLModel):
     language: str = "en"
     bio: str | None
     valid_proxy: bool = None
-    organization_id: UUID = None
+    organization_id: UUID = ForeignKey("Organization.id")
     credentials: dict = None
     image_ids: List[str] = Field(default=None, sa_column=Column(ARRAY(String())))
 

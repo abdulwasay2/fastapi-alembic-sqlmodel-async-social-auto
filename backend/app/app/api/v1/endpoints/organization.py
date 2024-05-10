@@ -12,6 +12,7 @@ from app.schemas.organization_schema import (
     IOrganizationUpdate,
 )
 from app.schemas.response_schema import (
+    IDeleteResponseBase,
     IGetResponseBase,
     IGetResponsePaginated,
     IPostResponseBase,
@@ -74,5 +75,20 @@ async def update_organization(
     """
     Updates a organization by its id
     """
-    organization_updated = await crud.organization.update(obj_current=current_organization, obj_new=organization)
+    organization_updated = await crud.organization.update(
+        obj_current=current_organization, obj_new=organization)
     return create_response(data=organization_updated)
+
+
+@router.delete("/{organization_id}")
+async def remove_organization(
+    organization_id: UUID,
+) -> IDeleteResponseBase[IOrganizationRead]:
+    """
+    Deletes a organization by its id
+    """
+    organization = await crud.organization.get(id=organization_id)
+    if not organization:
+        raise IdNotFoundException(Organization, organization_id)
+    organization = await crud.organization.remove(id=organization_id)
+    return create_response(data=organization)

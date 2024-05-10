@@ -5,6 +5,7 @@ from app import crud
 from app.api import deps
 from app.deps import account_deps
 from app.models.account_model import Account
+from app.models.organization_model import Organization
 from app.models.user_model import User
 from app.schemas.account_schema import (
     IAccountCreate,
@@ -12,6 +13,7 @@ from app.schemas.account_schema import (
     IAccountUpdate,
 )
 from app.schemas.response_schema import (
+    IDeleteResponseBase,
     IGetResponseBase,
     IGetResponsePaginated,
     IPostResponseBase,
@@ -62,7 +64,8 @@ async def create_account(
     account_current = await crud.account.get_account_by_name(name=account.name)
     if account_current:
         raise NameExistException(Account, name=account.name)
-    # new_account = await crud.account.create(obj_in=account, created_by_id=current_user.id)
+    if not await crud.organization.get(id=account.organization_id):
+        raise IdNotFoundException(Organization, account.organization_id)
     new_account = await crud.account.create(obj_in=account)
     return create_response(data=new_account)
 
@@ -76,7 +79,23 @@ async def update_account(
     Updates a account by its id
     """
     account_updated = await crud.account.update(obj_current=current_account, obj_new=account)
+    if account.organization_id and not await crud.organization.get(id=account.organization_id):
+        raise IdNotFoundException(Organization, account.organization_id)
     return create_response(data=account_updated)
+
+
+@router.delete("/{account_id}")
+async def remove_account(
+    account_id: UUID,
+) -> IDeleteResponseBase[IAccountRead]:
+    """
+    Deletes a account by its id
+    """
+    account = await crud.account.get(id=account_id)
+    if not account:
+        raise IdNotFoundException(Account, account_id)
+    account = await crud.account.remove(id=account_id)
+    return create_response(data=account)
 
 
 @router.post("/validate_proxy/{account_id}")

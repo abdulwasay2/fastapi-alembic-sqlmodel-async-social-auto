@@ -13,6 +13,7 @@ from app.schemas.project_schema import (
     IProjectUpdate,
 )
 from app.schemas.response_schema import (
+    IDeleteResponseBase,
     IGetResponseBase,
     IGetResponsePaginated,
     IPostResponseBase,
@@ -62,9 +63,12 @@ async def create_project(
     """
     Creates a new project
     """
-    project_current = await crud.project.get_project_by_name(name=project.name, current_user=project.user_id)
+    project_current = await crud.project.get_project_by_name(
+        name=project.name, current_user=project.user_id)
     if project_current:
         raise NameExistException(Project, name=project.name)
+    if not await crud.user.get(id=project.user_id):
+        raise IdNotFoundException(User, project.user_id)
     new_project = await crud.project.create(obj_in=project)
     return create_response(data=new_project)
 
@@ -77,6 +81,9 @@ async def update_project(
     """
     Updates a project by its id
     """
+    if project.user_id and not await crud.user.get(id=project.user_id):
+        raise IdNotFoundException(User, project.user_id)
+
     project = project.model_dump(exclude_defaults=True, exclude_none=True)
     limits = project.pop("limits", None)
     if limits:
@@ -115,3 +122,17 @@ async def update_project(
 
     project_updated = await crud.project.update(obj_current=current_project, obj_new=project)
     return create_response(data=project_updated)
+
+
+@router.delete("/{project_id}")
+async def remove_project(
+    project_id: UUID,
+) -> IDeleteResponseBase[IProjectDetailsRead]:
+    """
+    Deletes a project by its id
+    """
+    project = await crud.project.get(id=project_id)
+    if not project:
+        raise IdNotFoundException(Project, project_id)
+    project = await crud.project.remove(id=project_id)
+    return create_response(data=project)

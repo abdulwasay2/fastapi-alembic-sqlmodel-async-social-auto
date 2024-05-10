@@ -5,6 +5,7 @@ from app import crud
 from app.api import deps
 from app.deps import conversation_deps
 from app.models.conversation_model import Conversation
+from app.models.account_model import Account
 from app.models.user_model import User
 from app.schemas.conversation_schema import (
     IConversationCreate,
@@ -16,6 +17,7 @@ from app.schemas.response_schema import (
     IGetResponsePaginated,
     IPostResponseBase,
     IPutResponseBase,
+    IDeleteResponseBase,
     create_response,
 )
 from app.utils.exceptions import (
@@ -56,11 +58,9 @@ async def create_conversation(
 ) -> IPostResponseBase[IConversationRead]:
     """
     Creates a new conversation
-
-    Required roles:
-    - admin
-    - manager
     """
+    if not await crud.account.get(id=conversation.account_id):
+        raise IdNotFoundException(Account, conversation.account_id)
     new_conversation = await crud.conversation.create(obj_in=conversation)
     return create_response(data=new_conversation)
 
@@ -72,10 +72,22 @@ async def update_conversation(
 ) -> IPutResponseBase[IConversationRead]:
     """
     Updates a conversation by its id
-
-    Required roles:
-    - admin
-    - manager
     """
+    if conversation.account_id and not await crud.account.get(id=conversation.account_id):
+        raise IdNotFoundException(Account, conversation.account_id)
     conversation_updated = await crud.conversation.update(obj_current=current_conversation, obj_new=conversation)
     return create_response(data=conversation_updated)
+
+
+@router.delete("/{conversation_id}")
+async def remove_conversation(
+    conversation_id: UUID,
+) -> IDeleteResponseBase[IConversationRead]:
+    """
+    Deletes a conversation by its id
+    """
+    conversation = await crud.conversation.get(id=conversation_id)
+    if not conversation:
+        raise IdNotFoundException(Conversation, conversation_id)
+    conversation = await crud.conversation.remove(id=conversation_id)
+    return create_response(data=conversation)
