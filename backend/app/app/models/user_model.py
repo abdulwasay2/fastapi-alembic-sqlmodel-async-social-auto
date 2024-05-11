@@ -1,13 +1,12 @@
 from app.models.base_uuid_model import BaseUUIDModel
-from app.models.organization_model import Organization
+# from app.models.organization_model import Organization
 from app.models.links_model import LinkGroupUser
-from app.schemas.common_schema import IGenderEnum
-from datetime import datetime
-from sqlmodel import BigInteger, Field, SQLModel, Relationship, Column, DateTime, String
+from sqlmodel import Field, SQLModel, Relationship, Column, String
 from typing import Optional
-from sqlalchemy_utils import ChoiceType
 from pydantic import EmailStr
 from uuid import UUID
+from app.models.project_model import Project
+from app.schemas.project_schema import IProjectRead
 
 
 class UserBase(SQLModel):
@@ -30,9 +29,25 @@ class User(BaseUUIDModel, UserBase, table=True):
         sa_relationship_kwargs={"lazy": "selectin"},
     )
     organization_id: UUID | None = Field(default=None, foreign_key="Organization.id")
-    organization: Organization = Relationship(
-        sa_relationship_kwargs={
-            "lazy": "joined",
-            "primaryjoin": "User.organization_id==Organization.id",
-        }
+    projects: list["Project"] = Relationship(  # noqa: F821
+        sa_relationship_kwargs={"lazy": "joined"}
     )
+
+    # TODO: Fix the circular dependency b/w user and organization to add below join
+
+    # organization = Relationship(
+    #     sa_relationship_kwargs={
+    #         "lazy": "joined",
+    #         "primaryjoin": "User.organization_id==Organization.id",
+    #     }
+    # )
+
+
+class UserProjectBase(SQLModel):
+    id: UUID
+    first_name: str
+    last_name: str
+    email: EmailStr
+    is_active: bool
+    is_superuser: bool
+    projects: list[IProjectRead]

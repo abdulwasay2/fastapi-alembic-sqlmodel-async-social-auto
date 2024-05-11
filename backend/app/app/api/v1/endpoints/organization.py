@@ -8,6 +8,7 @@ from app.models.organization_model import Organization
 from app.models.user_model import User
 from app.schemas.organization_schema import (
     IOrganizationCreate,
+    IOrganizationDetailsRead,
     IOrganizationRead,
     IOrganizationUpdate,
 )
@@ -41,7 +42,7 @@ async def get_organization(
 @router.get("/{organization_id}")
 async def get_organization_by_id(
     organization_id: UUID
-) -> IGetResponseBase[IOrganizationRead]:
+) -> IGetResponseBase[IOrganizationDetailsRead]:
     """
     Gets a organization by its id
     """

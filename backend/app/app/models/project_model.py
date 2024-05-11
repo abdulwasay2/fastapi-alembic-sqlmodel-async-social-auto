@@ -2,7 +2,7 @@ from uuid import UUID
 from sqlmodel import SQLModel, Field, Relationship, Column, String
 from app.models.base_uuid_model import BaseUUIDModel
 from app.schemas.common_schema import IGenderEnum, IStatusEnum, ITargetPlatformEnum
-from app.models.user_model import User
+# from app.models.user_model import User
 from sqlalchemy_utils import ChoiceType
 
 
@@ -61,12 +61,12 @@ class GeneralSettingsBase(SQLModel):
 
 class Project(BaseUUIDModel, ProjectBase, table=True):
     user_id: UUID = Field(foreign_key="User.id")
-    user: User = Relationship(
-        sa_relationship_kwargs={
-            "lazy": "joined",
-            "primaryjoin": "Project.user_id==User.id",
-        }
-    )
+    # user: User = Relationship(
+    #     sa_relationship_kwargs={
+    #         "lazy": "joined",
+    #         "primaryjoin": "Project.user_id==User.id",
+    #     }
+    # )
     limits: list["Limits"] = Relationship(
         back_populates="project", 
         sa_relationship_kwargs={'lazy': 'selectin'})
