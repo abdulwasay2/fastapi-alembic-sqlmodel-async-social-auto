@@ -90,6 +90,7 @@ class Limits(BaseUUIDModel, LimitsBase, table=True):
         sa_relationship_kwargs={
             "lazy": "joined",
             "primaryjoin": "Limits.project_id==Project.id",
+            "cascade": "delete"
         }
     )
 
@@ -100,6 +101,7 @@ class Delays(BaseUUIDModel, DelaysBase, table=True):
         sa_relationship_kwargs={
             "lazy": "joined",
             "primaryjoin": "Delays.project_id==Project.id",
+            "cascade": "delete"
         }
     )
 
@@ -111,6 +113,7 @@ class SwipeSettings(BaseUUIDModel, SwipeSettingsBase, table=True):
         sa_relationship_kwargs={
             "lazy": "joined",
             "primaryjoin": "SwipeSettings.project_id==Project.id",
+            "cascade": "delete"
         }
     )
 
@@ -121,6 +124,7 @@ class ChattingSettings(BaseUUIDModel, ChattingSettingsBase, table=True):
         sa_relationship_kwargs={
             "lazy": "joined",
             "primaryjoin": "ChattingSettings.project_id==Project.id",
+            "cascade": "delete"
         }
     )
 
@@ -131,5 +135,6 @@ class GeneralSettings(BaseUUIDModel, GeneralSettingsBase, table=True):
         sa_relationship_kwargs={
             "lazy": "joined",
             "primaryjoin": "GeneralSettings.project_id==Project.id",
+            "cascade": "delete"
         }
     )

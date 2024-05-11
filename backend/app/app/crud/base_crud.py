@@ -6,7 +6,7 @@ from fastapi_pagination.ext.sqlmodel import paginate
 from fastapi_async_sqlalchemy import db
 from fastapi_pagination import Params, Page
 from pydantic import BaseModel
-from sqlmodel import SQLModel, select, func
+from sqlmodel import SQLModel, select, func, exists
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlmodel.sql.expression import Select
 from sqlalchemy import exc
@@ -51,6 +51,14 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             query = select(self.model).where(self.model.id == id)
         response = await db_session.execute(query)
         return response.scalar_one_or_none()
+    
+    async def exists(
+        self, *, id: UUID | str, db_session: AsyncSession | None = None,
+    ) -> ModelType | None:
+        db_session = db_session or self.db.session
+        query = select(exists().where(self.model.id == id))
+        response = await db_session.execute(query)
+        return response.scalar()
 
     async def get_by_ids(
         self,

@@ -10,7 +10,7 @@ import sqlalchemy as sa
 import sqlalchemy_utils
 import sqlmodel # added
 
-from app.models.user_model import IGenderEnum
+from app.schemas.common_schema import IGenderEnum
 
 
 # revision identifiers, used by Alembic.

@@ -67,7 +67,7 @@ async def create_project(
         name=project.name, current_user=project.user_id)
     if project_current:
         raise NameExistException(Project, name=project.name)
-    if not await crud.user.get(id=project.user_id):
+    if not await crud.user.exists(id=project.user_id):
         raise IdNotFoundException(User, project.user_id)
     new_project = await crud.project.create(obj_in=project)
     return create_response(data=new_project)
@@ -81,7 +81,7 @@ async def update_project(
     """
     Updates a project by its id
     """
-    if project.user_id and not await crud.user.get(id=project.user_id):
+    if project.user_id and not await crud.user.exists(id=project.user_id):
         raise IdNotFoundException(User, project.user_id)
 
     project = project.model_dump(exclude_defaults=True, exclude_none=True)
