@@ -18,19 +18,19 @@ import requests
 import atexit
 from pathlib import Path
 
-# Tinderbotz: helper classes
-from tinderbotz.helpers.geomatch import Geomatch
-from tinderbotz.helpers.match import Match
-from tinderbotz.helpers.profile_helper import ProfileHelper
-from tinderbotz.helpers.preferences_helper import PreferencesHelper
-from tinderbotz.helpers.geomatch_helper import GeomatchHelper
-from tinderbotz.helpers.match_helper import MatchHelper
-from tinderbotz.helpers.login_helper import LoginHelper
-from tinderbotz.helpers.storage_helper import StorageHelper
-from tinderbotz.helpers.email_helper import EmailHelper
-from tinderbotz.helpers.constants_helper import Printouts
-from tinderbotz.helpers.xpaths import *
-from tinderbotz.addproxy import get_proxy_extension
+# tinder_utils: helper classes
+from app.tinder_utils.helpers.geomatch import Geomatch
+from app.tinder_utils.helpers.match import Match
+from app.tinder_utils.helpers.profile_helper import ProfileHelper
+from app.tinder_utils.helpers.preferences_helper import PreferencesHelper
+from app.tinder_utils.helpers.geomatch_helper import GeomatchHelper
+from app.tinder_utils.helpers.match_helper import MatchHelper
+from app.tinder_utils.helpers.login_helper import LoginHelper
+from app.tinder_utils.helpers.storage_helper import StorageHelper
+from app.tinder_utils.helpers.email_helper import EmailHelper
+from app.tinder_utils.helpers.constants_helper import Printouts
+from app.tinder_utils.helpers.xpaths import *
+from app.tinder_utils.addproxy import get_proxy_extension
 
 
 class Session:
@@ -63,7 +63,7 @@ class Session:
 
             # print out the statistics of the session
             try:
-                box = self._get_msg_box(lines=lines, title="Tinderbotz")
+                box = self._get_msg_box(lines=lines, title="tinder_utils")
                 print(box)
             finally:
                 print("Started session: {}".format(self.started))
@@ -175,7 +175,7 @@ class Session:
             time.sleep(5)
         if not self._is_logged_in():
             print('Manual interference is required.')
-            input('press ENTER to continue')
+            time.sleep(50)
 
     def login_using_facebook(self, email, password):
         self.email = email
@@ -185,7 +185,7 @@ class Session:
             time.sleep(5)
         if not self._is_logged_in():
             print('Manual interference is required.')
-            input('press ENTER to continue')
+            time.sleep(50)
 
     def login_using_sms(self, country, phone_number):
         if not self._is_logged_in():
@@ -194,7 +194,7 @@ class Session:
             time.sleep(5)
         if not self._is_logged_in():
             print('Manual interference is required.')
-            input('press ENTER to continue')
+            time.sleep(50)
 
     def store_local(self, match):
         if isinstance(match, Match):

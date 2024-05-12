@@ -12,11 +12,11 @@ class EmailHelper:
         msg.set_content(match_msg)
 
         msg['Subject'] = 'NEW TINDER MATCH'
-        msg['From'] = "github.tinderbotz@gmail.com"
+        msg['From'] = "github.tinder_utils@gmail.com"
         msg['To'] = to
 
         # Send the message via our own SMTP server.
         server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-        server.login("github.tinderbotz@gmail.com", "kuzdys-1zafri-Pebzob")
+        server.login("github.tinder_utils@gmail.com", "kuzdys-1zafri-Pebzob")
         server.send_message(msg)
         server.quit()

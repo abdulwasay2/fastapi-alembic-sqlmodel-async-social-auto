@@ -119,6 +119,6 @@ async def validate_account(
     Validates the account credentials and proxy
     """
     print(account_id)
-    validate_account_proxy(account_id)
+    # validate_account_proxy(account_id)
     validate_account_credentials.delay(account_id)
     return {"message": "task queued"}

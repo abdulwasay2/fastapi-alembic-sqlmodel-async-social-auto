@@ -3,7 +3,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException, ElementClickInterceptedException, StaleElementReferenceException, NoSuchElementException
 from selenium.webdriver.common.keys import Keys
-from tinderbotz.helpers.xpaths import content
+from app.tinder_utils.helpers.xpaths import content
 import time
 
 class LoginHelper:
@@ -36,7 +36,6 @@ class LoginHelper:
         # xpath = '//*[@aria-label="Log in with Google"]'
         xpath = '//*[@title="Sign in with Google Button"]'
         xpath = '//div[@class="S9gUrf-YoZ4jf"]'
-        import pdb; pdb.set_trace()
         try:
             WebDriverWait(self.browser, self.delay).until(EC.presence_of_element_located(
                 (By.XPATH, xpath)))
@@ -191,7 +190,6 @@ class LoginHelper:
                 span = el.find_element(By.XPATH, './/span')
                 if span.text.lower() == country.lower():
                     print("clicked")
-                    import pdb; pdb.set_trace()
                     el.click()
                     break
                 else:

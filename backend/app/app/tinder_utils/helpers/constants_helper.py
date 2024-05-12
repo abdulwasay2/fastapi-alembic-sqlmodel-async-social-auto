@@ -69,7 +69,7 @@ class Printouts(enum.Enum):
 Hi guys,
 
 This code is opensource and available on GitHub.
-repository: https://github.com/frederikme/TinderBotz
+repository: https://github.com/frederikme/tinder_utils
 
 If you find the code useful, it would mean a lot if you can star the repository to show your appreciation.
 If you're interested in learning how to write these bots yourself,

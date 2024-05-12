@@ -6,7 +6,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 import time
 import re
-from tinderbotz.helpers.xpaths import content
+from app.tinder_utils.helpers.xpaths import content
 from datetime import datetime
 
 class GeomatchHelper:

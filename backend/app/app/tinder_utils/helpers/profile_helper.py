@@ -3,7 +3,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
-from tinderbotz.helpers.xpaths import content, modal_manager
+from app.tinder_utils.helpers.xpaths import content, modal_manager
 from selenium.webdriver.common.keys import Keys
 
 import time, os

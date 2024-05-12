@@ -11,7 +11,7 @@ from uuid import UUID
 #         account = await crud.organization.get(id=uuid, db_session=session)
 #         return account
 
-
+@optional(without_fields=["valid_proxy", "image_ids"])
 class IAccountCreate(AccountBase):
     pass
     

@@ -1,4 +1,4 @@
-from tinderbotz.helpers.geomatch import Geomatch
+from app.tinder_utils.helpers.geomatch import Geomatch
 
 # A match has the same information as a geomatch, except that you have a chatroom with an id
 class Match(Geomatch):

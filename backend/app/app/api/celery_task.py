@@ -9,7 +9,7 @@ from celery import Task
 from app.deps.account_deps import get_account_by_id
 from app import crud
 from proxy_checker_httpx import ProxyChecker
-from app.tinderbotz.session import Session
+from app.tinder_utils.session import Session
 
 
 @celery.task(name="tasks.increment")
@@ -87,29 +87,38 @@ def validate_account_credentials(account_id: UUID):
     proxy_parts = account.proxy.split(':') if account.proxy else []
     asyncio.get_event_loop().run_until_complete(checker.initialize())
     proxy_data = None
+    is_verified = False
+    proxy_formatted = None
     if len(proxy_parts) == 2:
         proxy_data = asyncio.get_event_loop().run_until_complete(
             checker.check_proxy(f'{proxy_parts[0]}:{proxy_parts[1]}'))
+        if proxy_data:
+            proxy_formatted = f"{proxy_parts[0]}:{proxy_parts[1]}"
     elif len(proxy_parts) == 4:
         proxy_data = asyncio.get_event_loop().run_until_complete(
             checker.check_proxy(f'{proxy_parts[0]}:{proxy_parts[1]}', 
             user=proxy_parts[2], password=proxy_parts[3]))
+        if proxy_data:
+            proxy_formatted = f"{proxy_parts[2]}:{proxy_parts[3]}@{proxy_parts[0]}:{proxy_parts[1]}"
 
     # Validate Account
-    session = Session(
-        proxy="ysquyizh:ufeiy8gj7j6a@38.154.227.167:5868", 
-        headless=False, store_session=False)
-    email = account.credentials.get("email")
-    password = account.credentials.get("password")
-    if account.platform == "facebook":
-        session.login_using_facebook(email, password)
-    elif account.platform == "google":
-        session.login_using_google(email, password)
-    # elif account.platform == "sim":
-    #     session.login_using_sms()
+    if account.credentials:
+        session = Session(
+            proxy=proxy_formatted, 
+            headless=False, store_session=False)
+        email = account.credentials.get("email")
+        password = account.credentials.get("password")
+        if account.platform == "facebook":
+            session.login_using_facebook(email, password)
+        elif account.platform == "google":
+            session.login_using_google(email, password)
+        # elif account.platform == "sim":
+        #     session.login_using_sms()
+        is_verified = session._is_logged_in()
+        session.browser.quit()
     updated_data = {
         "valid_proxy": True if proxy_data else False,
-        "is_verified": session._is_logged_in()
+        "is_verified": is_verified
         }
     
     updated_account = asyncio.get_event_loop().run_until_complete(update_account(account, updated_data))

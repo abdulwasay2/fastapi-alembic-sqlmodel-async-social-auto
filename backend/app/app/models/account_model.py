@@ -19,17 +19,17 @@ class AccountBase(SQLModel):
     location: str | None
     language: str = "en"
     bio: str | None
-    valid_proxy: bool = None
+    valid_proxy: bool = Field(default=False)
     organization_id: UUID = ForeignKey("Organization.id")
     credentials: dict = None
-    image_ids: List[str] = Field(default=None, sa_column=Column(ARRAY(String())))
+    image_ids: List[str] = Field(default=[], sa_column=Column(ARRAY(String())))
+    platform: str = Field(default="google", nullable=False)
 
 
 class Account(BaseUUIDModel, AccountBase, table=True):
     # space_id  (fk is missing)
     # image_ids (fk is missing)
 
-    platform: str = Field(default="tinder", nullable=False)
     credentials: dict = Field(sa_column=Column(JSON), default_factory=dict)
     is_banned: bool = Field(default=False)
     is_verified: bool = Field(default=True)
