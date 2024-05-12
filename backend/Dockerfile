@@ -1,4 +1,4 @@
-FROM tiangolo/uvicorn-gunicorn-fastapi:python3.11-slim
+FROM --platform=linux/amd64 tiangolo/uvicorn-gunicorn-fastapi:python3.11-slim
 ENV PYTHONUNBUFFERED=1
 ENV PIP_DEFAULT_TIMEOUT=100
 WORKDIR /code
